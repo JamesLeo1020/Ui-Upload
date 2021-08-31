@@ -4,63 +4,49 @@
 <h2 class="header">Create Post</h2>
 <div class="container-post">
   <div class="conpreview">
-
+          <!-- <div class="border p-2 mt-3"> -->
+            <!-- <p>Preview Here:</p>
+            <template v-if="preview">
+              <img :src="preview" class="img-fluid" />
+              <p class="mb-0">file name: {{ image.name }}</p>
+              <p class="mb-0">size: {{ image.size/1024 }}KB</p>
+            </template> -->
+          <!-- </div> -->
+          <div class="border p-2 mt-3">
+            <p>Preview Here:</p>
+            <template v-if="preview_list.length">
+              <div v-for="item, index in preview_list" :key="index">
+                <img :src="item" class="img-fluid" />
+                <p class="mb-0">file name: {{ image_list[index].name }}</p>
+                <p>size: {{ image_list[index].size/1024 }}KB</p>
+              </div>
+            </template>
+          </div>
   </div>
   <div class="condropzone">
-    <!-- <div id="wrapper">
-      <input type="file" accept="image/*" onchange="preview_image(event)">
-      <img id="output_image"/>
+
+
+<!-- <dropzone id="foo" ref="el" :options="options" :destroyDropzone="true">
+    <div class="dropzone-custom-content">
+          <h3 class="dropzone-custom-title">Custom slot</h3>
+        <p class="subtitle">Subtitle</p>
     </div>
-  </div> -->
+</dropzone> -->
+    <!-- <div class="col-md-5 offset-md-1"> -->
+      <h5>2. multiple file</h5>
 
-  <!-- <form action="/file-upload"
-      class="dropzone"
-      id="my-awesome-dropzone"></form>
-  </div> -->
-
-<!-- <main class="col s12">
-  <div class="row">
-    <form action="upload.php" id="zdrop" class="fileuploader centre-allign">
-      <div id="upload-label" style="width: 200px">
-        <i class="uil uil-upload"></i>
-      </div>
-      <span class="tittle">Click Button or Drop File Here</span>
-    </form>
-
-    <div class="preview-container">
-      <div class="collection card" id="previews">
-        <div class="collection-item clearhack valign-wrapper item-template" id="zdrop-template">
-          <div class="left pv zdrop-info" data-dz-thumnail>
-            <div>
-              <span data-dz-name></span> <span data-dz-size></span>
-            </div>
-            <div class="progress">
-              <div class="determinate" style="width:0" data-dz-uploadprogress></div>
-            </div>
-            <div class="dz-error-message">
-              <span data-dz-error-message></span>
-            </div>
-            <div class="secondary-content actions">
-              <a href="#!" data-dz-remove class="btn-floating ph red white-text waves-effect waves-light"><i class="material-icons white-text">clear</i></a>
-            </div>
-          </div>
+      <form>
+        <div class="form-group">
+          <!-- <label for="my-file">Select Image</label>
+          <input type="file" accept="image/*" @change="previewImage" class="form-control-file" id="my-file">
+     -->
+          <label for="my-file">Select Image</label>
+          <input type="file" accept="image/*" multiple="multiple" @change="previewMultiImage" class="form-control-file" id="my-file">
 
         </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</main> -->
-
-<dropzone id="foo" ref="el" :options="options" :destroyDropzone="true">
-  <div class="dropzone-custom-content">
-                <h3 class="dropzone-custom-title">Custom slot</h3>
-                <p class="subtitle">Subtitle</p>
-                </div>
-</dropzone>
+      </form>
+      
+    <!-- </div> -->
 
 </div>
 
@@ -110,24 +96,65 @@
 
 <script>
 import sideBar from '../components/side-bar.vue'
-import Dropzone from 'nuxt-dropzone'
+// import Dropzone from 'nuxt-dropzone'
 import 'nuxt-dropzone/dropzone.css'
 export default {
   components: {
-    Dropzone
+    // Dropzone
   },
   data() {
     return {
+      preview: null,
+      image: null,
+      preview_list: [],
+      image_list: [],
       // See https://rowanwins.github.io/vue-dropzone/docs/dist/index.html#/props
       options: {
         url: "http://httpbin.org/anything"
       }
+      
     }
   },
-  mounted() {
-    // Everything is mounted and you can access the dropzone instance
-    const instance = this.$refs.el.dropzone
+  // mounted() {
+  //   // Everything is mounted and you can access the dropzone instance
+  //   const instance = this.$refs.el.dropzone
+  // },
+  methods: {
+      previewImage: function(event) {
+      var input = event.target;
+      if (input.files) {
+        var reader = new FileReader();
+        reader.onload = (e) => {
+          this.preview = e.target.result;
+        }
+        this.image=input.files[0];
+        reader.readAsDataURL(input.files[0]);
+      }
+    },
+    previewMultiImage: function(event) {
+      var input = event.target;
+      var count = input.files.length;
+      var index = 0;
+      if (input.files) {
+        while(count --) {
+          var reader = new FileReader();
+          reader.onload = (e) => {
+            this.preview_list.push(e.target.result);
+          }
+          this.image_list.push(input.files[index]);
+          reader.readAsDataURL(input.files[index]);
+          index ++;
+        }
+      }
+    },
+    reset: function() {
+      this.image = null;
+      this.preview = null;
+      this.image_list = [];
+      this.preview_list = [];
+    }
   }
+
 }
 // function preview_image(event) 
 // {
@@ -141,7 +168,3 @@ export default {
 // }
 
 </script>
-
-<style>
-
-</style>
